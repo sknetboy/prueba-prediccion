@@ -1,0 +1,13 @@
+{
+  "predict_request": {
+    "tiempo_contrato_meses": "integer >= 0",
+    "retrasos_pago": "integer >= 0",
+    "uso_mensual": "number >= 0",
+    "plan": "Basic | Standard | Premium"
+  },
+  "predict_response": {
+    "prevision": "Va a cancelar | Va a continuar",
+    "probabilidad": "0..1",
+    "factores_clave": ["string"]
+  }
+}

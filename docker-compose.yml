@@ -1,0 +1,18 @@
+version: '3.9'
+services:
+  microservicio-ds:
+    build: ./ds-service
+    ports: ['8000:8000']
+  backend:
+    build: ./backend
+    environment:
+      DS_SERVICE_URL: http://microservicio-ds:8000
+    ports: ['8080:8080']
+    depends_on: [microservicio-ds, postgres]
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: churn
+      POSTGRES_PASSWORD: churn
+      POSTGRES_DB: churn
+    ports: ['5432:5432']
