@@ -103,7 +103,8 @@ Configurado para tu setup de Windows 11:
    cd ds-service
    python -m venv .venv
    source .venv/bin/activate  # En Windows: .venv\\Scripts\\activate
-   pip install -r requirements.txt
+   python -m pip install --upgrade pip setuptools wheel
+   pip install --prefer-binary -r requirements.txt
    uvicorn app.api.main:app --reload
    ```
 2. Backend:
@@ -121,7 +122,8 @@ Configurado para tu setup de Windows 11:
 cd ds-service
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+python -m pip install --upgrade pip setuptools wheel
+pip install --prefer-binary -r requirements.txt
 uvicorn app.api.main:app --host 0.0.0.0 --port 8000
 
 # 2) Backend (otra consola)
@@ -133,6 +135,23 @@ cd frontend
 npm install
 npm run dev
 ```
+
+
+## Solución de errores comunes (Python 3.14 en Windows)
+Si ves errores como `Failed to build pandas` o `ConnectionResetError(10054)` al instalar dependencias:
+
+1. Fuerza instalación por ruedas binarias y aumenta reintentos:
+   ```powershell
+   pip install --upgrade pip setuptools wheel
+   pip config set global.timeout 120
+   pip config set global.retries 10
+   pip install --prefer-binary -r requirements.txt
+   ```
+2. Si tu red corporativa corta descargas, usa mirror de PyPI:
+   ```powershell
+   pip install -r requirements.txt -i https://pypi.org/simple
+   ```
+3. Este proyecto ya no requiere `pandas` para entrenar el modelo DS, reduciendo compilaciones pesadas en Windows/Python 3.14.
 
 ## Docker Compose
 ```bash

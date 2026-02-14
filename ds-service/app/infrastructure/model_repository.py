@@ -2,7 +2,6 @@ from pathlib import Path
 
 import joblib
 import numpy as np
-import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
@@ -31,14 +30,12 @@ class JoblibModelRepository(ModeloRepositoryPort):
         return [name for name, _ in sorted_items[:top_n]]
 
     def train_and_save_model(self):
-        df = self._create_dataset()
-        X = df[["tiempo_contrato_meses", "retrasos_pago", "uso_mensual", "plan"]]
-        y = df["churn"]
+        X, y = self._create_dataset()
 
         preprocessor = ColumnTransformer(
             transformers=[
-                ("cat", OneHotEncoder(handle_unknown="ignore"), ["plan"]),
-                ("num", "passthrough", ["tiempo_contrato_meses", "retrasos_pago", "uso_mensual"]),
+                ("cat", OneHotEncoder(handle_unknown="ignore"), [3]),
+                ("num", "passthrough", [0, 1, 2]),
             ]
         )
         pipeline = Pipeline(
@@ -68,19 +65,19 @@ class JoblibModelRepository(ModeloRepositoryPort):
             "plan": 0.0,
         }
         for name, value in zip(feature_names, importances):
-            if "plan" in name:
+            if "x3" in name:
                 grouped["plan"] += float(value)
-            elif "tiempo_contrato_meses" in name:
+            elif "x0" in name:
                 grouped["tiempo_contrato_meses"] += float(value)
-            elif "retrasos_pago" in name:
+            elif "x1" in name:
                 grouped["retrasos_pago"] += float(value)
-            elif "uso_mensual" in name:
+            elif "x2" in name:
                 grouped["uso_mensual"] += float(value)
 
         artifact = {"pipeline": pipeline, "metrics": metrics, "feature_importance": grouped}
         joblib.dump(artifact, self.model_path)
 
-    def _create_dataset(self) -> pd.DataFrame:
+    def _create_dataset(self):
         rng = np.random.default_rng(42)
         size = 1500
         contract = rng.integers(1, 60, size)
@@ -96,12 +93,6 @@ class JoblibModelRepository(ModeloRepositoryPort):
         )
         churn = (risk > 0.45).astype(int)
 
-        return pd.DataFrame(
-            {
-                "tiempo_contrato_meses": contract,
-                "retrasos_pago": delays,
-                "uso_mensual": usage,
-                "plan": plan,
-                "churn": churn,
-            }
-        )
+        X = np.column_stack([contract, delays, usage, plan]).astype(object)
+        y = churn.astype(int)
+        return X, y
