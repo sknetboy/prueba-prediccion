@@ -10,15 +10,15 @@ Plataforma de predicción de churn con arquitectura hexagonal en tres capas: DS 
 ## Contrato de integración
 Se define en `integration-contract.json` y se comparte entre equipos.
 
-## Matriz de versiones (fijadas)
-Para evitar incompatibilidades en todos los entornos:
-- **Java**: Temurin/OpenJDK **17.0.12**
-- **Python**: **3.11.9**
+## Matriz de versiones objetivo (tu entorno local)
+Configurado para tu setup de Windows 11:
+- **Java**: Oracle/OpenJDK **21.0.8 LTS**
+- **Maven**: **3.9.12**
+- **Python**: **3.14.2**
 - **Node.js**: **20.17.0**
 - **npm**: **10.8.2**
-- **Maven**: **3.9.9**
 
-> Nota: el backend está configurado con `java.version=17` en `pom.xml`.
+> Nota: el backend ahora está configurado con `java.version=21` en `pom.xml`.
 
 ## Checklist de instalación por sistema operativo
 
@@ -49,16 +49,17 @@ Para evitar incompatibilidades en todos los entornos:
   mvn -v
   ```
 
-### Windows 10/11
-- [ ] Instalar **Temurin JDK 17.0.12** y validar `JAVA_HOME`.
-- [ ] Instalar **Python 3.11.9** (activar “Add Python to PATH”).
+### Windows 11 (recomendado para tu caso)
+- [ ] Instalar **Oracle/OpenJDK 21.0.8 LTS** y validar `JAVA_HOME`.
+- [ ] Instalar **Apache Maven 3.9.12** y validar `MAVEN_HOME` + `PATH`.
+- [ ] Instalar **Python 3.14.2** (activar “Add Python to PATH”).
 - [ ] Instalar **NVM for Windows** y luego Node 20.17.0:
   ```powershell
   nvm install 20.17.0
   nvm use 20.17.0
   npm i -g npm@10.8.2
   ```
-- [ ] Instalar **Maven 3.9.9** y configurar `MAVEN_HOME` + `PATH`.
+- [ ] Instalar **Maven 3.9.12** y configurar `MAVEN_HOME` + `PATH`.
 - [ ] Verificar versiones:
   ```powershell
   java -version
@@ -67,6 +68,10 @@ Para evitar incompatibilidades en todos los entornos:
   npm -v
   mvn -v
   ```
+- [ ] Salida esperada mínima:
+  - `java --version` -> `21.0.8 LTS`
+  - `mvn -v` -> `Apache Maven 3.9.12`
+  - `python --version` -> `Python 3.14.2`
 
 ### macOS (Ventura/Sonoma)
 - [ ] Instalar Homebrew (si no existe).
@@ -96,7 +101,7 @@ Para evitar incompatibilidades en todos los entornos:
 1. DS service:
    ```bash
    cd ds-service
-   python3.11 -m venv .venv
+   python -m venv .venv
    source .venv/bin/activate  # En Windows: .venv\\Scripts\\activate
    pip install -r requirements.txt
    uvicorn app.api.main:app --reload
@@ -109,6 +114,25 @@ Para evitar incompatibilidades en todos los entornos:
    ```bash
    cd frontend && npm install && npm run dev
    ```
+
+## Ejecución local en Windows (PowerShell)
+```powershell
+# 1) DS service
+cd ds-service
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+uvicorn app.api.main:app --host 0.0.0.0 --port 8000
+
+# 2) Backend (otra consola)
+cd backend
+mvn spring-boot:run
+
+# 3) Frontend (otra consola)
+cd frontend
+npm install
+npm run dev
+```
 
 ## Docker Compose
 ```bash
